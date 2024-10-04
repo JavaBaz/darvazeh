@@ -1,11 +1,7 @@
 package com.github.javabaz.darvazeh.feature.user;
 
-
-
-
-
-
 import com.github.javabaz.darvazeh.common.auth.otp.OtpUtil;
+import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
@@ -21,17 +17,19 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService extends BaseServiceImpl implements UserDetailsService {
 
     private UserRepository userRepository;
     private UnverifiedUserRepository unverifiedUserRepository;
     private OtpUtil otpUtil;
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil) {
+    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
+        super(userRepository);
         this.userRepository = userRepository;
         this.unverifiedUserRepository = unverifiedUserRepository;
         this.otpUtil = otpUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class UserService implements UserDetailsService {
             return User.builder()
                     .username(userObj.getUsername())
                     .password(userObj.getPassword())
-                    .roles(userObj.getRole().name())
+                    .roles(userObj.getUserRole().name())
                     .build();
         } else {
             throw new UsernameNotFoundException(username);
@@ -81,7 +79,7 @@ public class UserService implements UserDetailsService {
 
         MyUser newUser = new MyUser();
         newUser.setUsername(phoneNumber);
-        newUser.setRole(role);
+        newUser.setUserRole(role);
         userRepository.save(newUser);
 
         unverifiedUserRepository.deleteByUsername(phoneNumber);
@@ -154,6 +152,4 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
-
-
 }
