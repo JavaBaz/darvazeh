@@ -20,7 +20,7 @@ import java.util.Optional;
 public class UserService extends BaseServiceImpl implements UserDetailsService {
 
     private UserRepository userRepository;
-    private UnverifiedUserRepository unverifiedUserRepository;
+    private UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
     private OtpUtil otpUtil;
     private PasswordEncoder passwordEncoder;
 
