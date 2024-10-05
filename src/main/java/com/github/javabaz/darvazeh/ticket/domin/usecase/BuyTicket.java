@@ -19,19 +19,6 @@ public class BuyTicket {
     private final Tickets tickets;
     private final EventService eventService;
 
-    public TicketResponse addNewTicketByAdmin(TicketRequest ticketRequest) {
-        var price = new Price(ticketRequest.getPrice());
-        // todo getUserId from JWT , get id after login
-//        var ticket = Ticket.createTicket(1L, price, ticketRequest.getStartTime(), ticketRequest.getEventId(), userId);
-//
-//        return TicketResponse.builder()
-//                .Id(id)
-//                .eventId(ticket.getEventId())
-//                .price(ticket.getPrice().price())
-//                .date(ticket.getEnableDateTime())
-//                .userId(userId);
-        return null;
-    }
 
     public TicketResponse buyTicket(BuyTicketRequest request) {
         var ticket = tickets.ticketBought(request.getTicketId());

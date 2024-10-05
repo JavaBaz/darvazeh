@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface Tickets {
 
 
-    Ticket addTicket(Ticket ticket, Long userId, Long eventId);
+    Optional<TicketEntity>  addTicket(Ticket ticket, Long userId, Long eventId);
 
 
     Optional<TicketEntity> modifyToBought(Ticket ticket, Long userId, Long eventId);
