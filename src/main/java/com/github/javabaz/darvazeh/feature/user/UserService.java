@@ -130,4 +130,10 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
                 });
 
     }
+
+    public UserEntity getUserByUsername(String username) {
+        Optional<UserEntity> userOpt = userRepository.findByUsername(username);
+        return userOpt.orElseThrow(() -> new IllegalStateException("User not found"));
+    }
+
 }
