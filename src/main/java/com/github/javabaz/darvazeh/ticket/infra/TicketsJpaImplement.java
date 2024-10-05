@@ -26,4 +26,15 @@ public class TicketsJpaImplement implements Tickets {
                         , entity.getEventId(), entity.getDateTime(), entity.getUserId()))
                 .orElseThrow(() -> new IllegalArgumentException("can not create ticket"));
     }
+
+    @Override
+    public boolean exist(Long id) {
+        return ticketJpaRepository.findById(id).isPresent();
+    }
+
+    @Override
+    public boolean userHasAnyTicket(Long userId) {
+        return ticketJpaRepository.existsByUserId(userId);
+
+    }
 }

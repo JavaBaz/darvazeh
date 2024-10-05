@@ -5,4 +5,10 @@ public record Price(Long price) {
         if (price < 0)
             throw new IllegalArgumentException("price can't be negative ");
     }
+
+    void isEqualOrGreater(Long price) {
+        if (this.price.compareTo(price) < 0)
+            throw new IllegalArgumentException("price can't be less than " + price);
+
+    }
 }

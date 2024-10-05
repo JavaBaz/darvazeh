@@ -1,6 +1,7 @@
 package com.github.javabaz.darvazeh.ticket.domin;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -26,5 +27,9 @@ public class Ticket {
         return new Ticket(ticketId, price, eventId, enableDateTime, userId);
     }
 
+//    public Ticket buyTicket(Long price, Long eventId, LocalDateTime time, Long userId) {
+//        this.price.isEqualOrGreater(price);
+////        enableDateTime.isBefore(time);
+//    }
 
 }

@@ -15,4 +15,5 @@ public class TicketRequest {
     private Long eventId;
     private LocalDateTime startTime;
     private Long price;
+
 }

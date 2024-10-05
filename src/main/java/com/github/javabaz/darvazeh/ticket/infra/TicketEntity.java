@@ -1,8 +1,13 @@
 package com.github.javabaz.darvazeh.ticket.infra;
 
 import com.github.javabaz.darvazeh.common.base.BaseEntity;
+import com.github.javabaz.darvazeh.feature.event.Event;
+import com.github.javabaz.darvazeh.feature.user.MyUser;
+import com.github.javabaz.darvazeh.ticket.domin.Price;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +23,8 @@ public class TicketEntity extends BaseEntity<Long> {
     private LocalDateTime dateTime;
     private Long price;
     private Long userId;
-
-
+    @ManyToOne
+    private Event event;
+    @OneToOne
+    private MyUser user;
 }
