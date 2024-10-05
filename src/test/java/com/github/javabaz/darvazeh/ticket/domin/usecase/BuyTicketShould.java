@@ -1,9 +1,6 @@
 package com.github.javabaz.darvazeh.ticket.domin.usecase;
 
 import com.github.javabaz.darvazeh.ticket.domin.Price;
-import com.github.javabaz.darvazeh.ticket.domin.Ticket;
-import com.github.javabaz.darvazeh.ticket.infra.BuyTicketRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

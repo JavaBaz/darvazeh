@@ -7,12 +7,10 @@ import com.github.javabaz.darvazeh.ticket.domin.Price;
 import com.github.javabaz.darvazeh.ticket.domin.Ticket;
 import com.github.javabaz.darvazeh.ticket.domin.Tickets;
 import com.github.javabaz.darvazeh.ticket.infra.TicketEntity;
-import com.github.javabaz.darvazeh.ticket.infra.TicketRequest;
-import com.github.javabaz.darvazeh.ticket.infra.TicketResponse;
+import com.github.javabaz.darvazeh.ticket.infra.presentation.dto.TicketRequest;
+import com.github.javabaz.darvazeh.ticket.infra.presentation.dto.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +20,6 @@ public class AddTicketByOrganization {
 
 
     public TicketResponse addTicket(TicketRequest ticketRequest) {
-
         Long price = ticketRequest.getPrice();
         Ticket ticket = Ticket.createTicket(null, new Price(price), ticketRequest.getStartTime());
         Event event = eventService.getById(ticketRequest.getEventId());

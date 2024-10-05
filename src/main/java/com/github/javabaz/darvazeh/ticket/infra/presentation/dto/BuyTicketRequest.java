@@ -1,4 +1,4 @@
-package com.github.javabaz.darvazeh.ticket.infra;
+package com.github.javabaz.darvazeh.ticket.infra.presentation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
