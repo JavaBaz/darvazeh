@@ -1,5 +1,8 @@
 package com.github.javabaz.darvazeh.ticket.domin.usecase;
 
+import com.github.javabaz.darvazeh.feature.event.Event;
+import com.github.javabaz.darvazeh.feature.event.EventRepository;
+import com.github.javabaz.darvazeh.feature.event.EventService;
 import com.github.javabaz.darvazeh.ticket.domin.Price;
 import com.github.javabaz.darvazeh.ticket.domin.Ticket;
 import com.github.javabaz.darvazeh.ticket.domin.Tickets;
@@ -14,6 +17,7 @@ import org.springframework.util.Assert;
 @RequiredArgsConstructor
 public class BuyTicket {
     private final Tickets tickets;
+    private final EventService eventService;
 
     public TicketResponse addNewTicketByAdmin(TicketRequest ticketRequest) {
         var price = new Price(ticketRequest.getPrice());
@@ -31,14 +35,20 @@ public class BuyTicket {
 
     public TicketResponse buyTicket(BuyTicketRequest request) {
         var ticket = tickets.ticketBought(request.getTicketId());
-//        Assert.isTrue(tickets.userHasAnyTicket(userId), "you already have ticket ");
-//        new Ticket()
+        existEvent(request.getEventId());
+        Assert.isTrue(tickets.userHasAnyTicket(userId), "you already have ticket ");
 
-        Ticket ticketBought = ticket.buyTicket(request.getPrice(), request.getStartTime());
+        Ticket ticketBought = ticket.buyTicket(request.getTicketId(), request.getPrice(), request.getStartTime());
+
+        return tickets.modifyToBought(ticketBought, userId, request.getEventId())
+                .map(ticketEntity -> new TicketResponse(ticketEntity.getId(), ticketEntity.getEventId(),
+                        ticketEntity.getPrice(), ticketEntity.getUserId(), ticketEntity.getDateTime()));
 
 
-        return null;
+    }
 
+    private void existEvent(Long eventId) {
+        eventService.getById(eventId);
     }
 
 }

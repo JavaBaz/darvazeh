@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 
 import java.io.Serializable;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 
 @Data
 @MappedSuperclass
+@SuperBuilder
 @NoArgsConstructor
 public class BaseEntity<ID extends Serializable> implements Serializable {
 

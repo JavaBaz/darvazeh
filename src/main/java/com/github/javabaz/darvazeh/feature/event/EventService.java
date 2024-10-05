@@ -17,6 +17,7 @@ public interface EventService {
 
     List<Event> getByEventDateBetween(LocalDate startDate, LocalDate endDate);
 
+    Event getById(Long id);
 
     Page<Event> getByEventCategory(Long eventCategoryId, int size, int page);
 

@@ -18,6 +18,12 @@ public class EventServiceImpl extends BaseServiceImpl<Event, Long, EventReposito
     }
 
     @Override
+    public Event getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found"));
+    }
+
+    @Override
     public Event getByName(String eventName) {
         return repository.findByName(eventName)
                 .orElseThrow(() -> new IllegalArgumentException("Event not found"));

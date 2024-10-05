@@ -27,6 +27,21 @@ public class TicketsJpaImplement implements Tickets {
     }
 
     @Override
+    public Optional<TicketEntity> modifyToBought(Ticket ticket, Long userId, Long eventId) {
+        var existTicket = getById(ticket.getTicketId());
+        TicketEntity ticketEntity = TicketEntity.builder()
+                .eventId(eventId)
+                .price(ticket.getPrice().price())
+                .dateTime(ticket.getEnableDateTime())
+                .userId(userId)
+                .isBought(true)
+                .build();
+        ticketEntity.setId(existTicket.getTicketId());
+
+        return Optional.of(ticketJpaRepository.save(ticketEntity));
+    }
+
+    @Override
     public Ticket getById(Long id) {
         return ticketJpaRepository.findById(id)
                 .map(ticketEntity -> Ticket.createTicket(ticketEntity.getId(), new Price(ticketEntity.getPrice()), ticketEntity.getDateTime()))

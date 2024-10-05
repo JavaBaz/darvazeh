@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class Ticket {
-    private final Long ticketId;
+    private Long ticketId;
     private final Price price;
     private LocalDateTime enableDateTime;
 
@@ -21,10 +21,11 @@ public class Ticket {
         return new Ticket(ticketId, price, enableDateTime);
     }
 
-    public Ticket buyTicket(Long price, LocalDateTime time) {
+    public Ticket buyTicket(Long ticketId, Long price, LocalDateTime time) {
+        this.ticketId=ticketId;
         this.price.isEqualOrGreater(price);
         isValidTime(time);
-        return new Ticket(this.ticketId,new Price(price),time);
+        return new Ticket(this.ticketId, new Price(price), time);
     }
 
     private void isValidTime(LocalDateTime time) {
