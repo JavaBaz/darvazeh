@@ -1,5 +1,6 @@
 package com.github.javabaz.darvazeh.feature.event;
 
+import com.github.javabaz.darvazeh.feature.event.enums.EventType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,4 +29,9 @@ public class EventController {
         return new ResponseEntity<>(eventCategory, HttpStatus.OK);
     }
 
+
+    @GetMapping
+    public List<Event> getByType(@RequestParam EventType eventType) {
+        return eventService.getByEventType(eventType);
+    }
 }
