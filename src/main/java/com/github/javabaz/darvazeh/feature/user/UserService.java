@@ -61,18 +61,13 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
 
 
     public void verifyOtp(String phoneNumber, String otp, UserRole role) {
-        Optional<UnverifiedUser> unverifiedUserOpt = unverifiedUserRepository.findByUsername(phoneNumber);
-        if (unverifiedUserOpt.isEmpty()) {
-            throw new IllegalStateException("Phone number is not pending verification.");
-        }
+        UnverifiedUser unverifiedUser = unverifiedUserRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("Phone number is not pending verification."));
 
-        UnverifiedUser unverifiedUser = unverifiedUserOpt.get();
+        Optional.of(unverifiedUser).filter(user -> user.getOtpCode().equals(otp))
+                .orElseThrow(() -> new IllegalStateException("Invalid OTP."));
 
-        if (!unverifiedUser.getOtpCode().equals(otp)) {
-            throw new IllegalStateException("Invalid OTP.");
-        }
-
-        MyUser newUser = new MyUser();
+        var newUser = new MyUser();
         newUser.setUsername(phoneNumber);
         newUser.setUserRole(role);
         userRepository.save(newUser);
@@ -143,15 +138,6 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
                 () -> {
                     throw new IllegalStateException("User not found.");
                 });
-//        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-//
-//        if (userOpt.isEmpty()) {
-//            throw new IllegalStateException("User not found.");
-//        }
-//
-//        MyUser user = userOpt.get();
-//
-//        user.setPassword(passwordEncoder.encode(password));
-//        userRepository.save(user);
+
     }
 }
