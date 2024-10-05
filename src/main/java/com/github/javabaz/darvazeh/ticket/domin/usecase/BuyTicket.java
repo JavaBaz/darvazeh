@@ -5,12 +5,11 @@ import com.github.javabaz.darvazeh.feature.event.EventService;
 import com.github.javabaz.darvazeh.ticket.domin.Ticket;
 import com.github.javabaz.darvazeh.ticket.domin.Tickets;
 import com.github.javabaz.darvazeh.ticket.infra.BuyTicketRequest;
+import com.github.javabaz.darvazeh.ticket.infra.TicketEntity;
 import com.github.javabaz.darvazeh.ticket.infra.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +27,17 @@ public class BuyTicket {
         Ticket ticketBought = ticket.buyTicket(request.getTicketId(), request.getPrice(), request.getStartTime());
 
         return tickets.modifyToBought(ticketBought, userId, request.getEventId())
-                .map(entity -> TicketResponse.builder().Id(entity.getId())
-                        .date(entity.getDateTime())
-                        .price(entity.getPrice())
-                        .eventId(request.getEventId())
-                        .userId(entity.getUserId()).build())
+                .map(entity -> buildTicketResponse(request, entity))
                 .orElseThrow(() -> new IllegalStateException("Invalid ticket"));
 
+    }
+
+    private static TicketResponse buildTicketResponse(BuyTicketRequest request, TicketEntity entity) {
+        return TicketResponse.builder().Id(entity.getId())
+                .date(entity.getDateTime())
+                .price(entity.getPrice())
+                .eventId(request.getEventId())
+                .userId(entity.getUserId()).build();
     }
 
     private void existEvent(Long eventId) {
