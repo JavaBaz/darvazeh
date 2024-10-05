@@ -30,8 +30,13 @@ public class BuyTicket {
     }
 
     public TicketResponse buyTicket(BuyTicketRequest request) {
-        Assert.isTrue(!tickets.exist(request.getTicketId()), "this ticket not exist ");
+        var ticket = tickets.ticketBought(request.getTicketId());
 //        Assert.isTrue(tickets.userHasAnyTicket(userId), "you already have ticket ");
+//        new Ticket()
+
+        Ticket ticketBought = ticket.buyTicket(request.getPrice(), request.getStartTime());
+
+
         return null;
 
     }

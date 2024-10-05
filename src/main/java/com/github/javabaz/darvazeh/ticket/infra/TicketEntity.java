@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
+
 public class TicketEntity extends BaseEntity<Long> {
     private Long eventId;
     private LocalDateTime dateTime;
@@ -27,4 +28,8 @@ public class TicketEntity extends BaseEntity<Long> {
     private Event event;
     @OneToOne
     private MyUser user;
+
+    private boolean isBought = false;
+
+    //todo count of tickets for each event
 }

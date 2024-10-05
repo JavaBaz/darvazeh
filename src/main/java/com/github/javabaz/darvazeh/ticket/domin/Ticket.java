@@ -1,5 +1,6 @@
 package com.github.javabaz.darvazeh.ticket.domin;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,10 @@ public class Ticket {
         return new Ticket(ticketId, price, enableDateTime);
     }
 
-    public Ticket buyTicket(Long price, Long eventId, LocalDateTime time, Long userId) {
+    public Ticket buyTicket(Long price, LocalDateTime time) {
         this.price.isEqualOrGreater(price);
         isValidTime(time);
-        return null;
+        return new Ticket(this.ticketId,new Price(price),time);
     }
 
     private void isValidTime(LocalDateTime time) {

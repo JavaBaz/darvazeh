@@ -23,7 +23,14 @@ public class TicketsJpaImplement implements Tickets {
 
         return Optional.of(ticketJpaRepository.save(ticketEntity))
                 .map(entity -> Ticket.createTicket(entity.getId(), new Price(entity.getPrice()), entity.getDateTime()))
-                        .orElseThrow(() -> new IllegalArgumentException("can not create ticket"));
+                .orElseThrow(() -> new IllegalArgumentException("can not create ticket"));
+    }
+
+    @Override
+    public Ticket getById(Long id) {
+        return ticketJpaRepository.findById(id)
+                .map(ticketEntity -> Ticket.createTicket(ticketEntity.getId(), new Price(ticketEntity.getPrice()), ticketEntity.getDateTime()))
+                .orElseThrow(() -> new IllegalArgumentException("ticket not exist "));
     }
 
     @Override
@@ -35,5 +42,13 @@ public class TicketsJpaImplement implements Tickets {
     public boolean userHasAnyTicket(Long userId) {
         return ticketJpaRepository.existsByUserId(userId);
 
+    }
+
+    @Override
+    public Ticket ticketBought(Long ticketId) {
+        return ticketJpaRepository.findById(ticketId).filter(ticketEntity -> !ticketEntity.isBought())
+                .map(ticketEntity -> Ticket.createTicket(ticketEntity.getId(),
+                        new Price(ticketEntity.getPrice()), ticketEntity.getDateTime()))
+                .orElseThrow(() -> new IllegalStateException("this ticket is bought "));
     }
 }
