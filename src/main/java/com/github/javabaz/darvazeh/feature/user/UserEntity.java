@@ -10,7 +10,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class MyUser extends BaseEntity<Long> {
+public class UserEntity extends BaseEntity<Long> {
 
     private String username;
     private String password;

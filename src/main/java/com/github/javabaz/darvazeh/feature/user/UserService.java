@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class UserService extends BaseServiceImpl implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository> implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
@@ -67,7 +67,7 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
         Optional.of(unverifiedUser).filter(user -> user.getOtpCode().equals(otp))
                 .orElseThrow(() -> new IllegalStateException("Invalid OTP."));
 
-        var newUser = new MyUser();
+        var newUser = new UserEntity();
         newUser.setUsername(phoneNumber);
         newUser.setUserRole(role);
         userRepository.save(newUser);
@@ -75,8 +75,8 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
         unverifiedUserRepository.deleteByUsername(phoneNumber);
     }
 
-    public MyUser login(String phoneNumber, String password) {
-        MyUser user = userRepository.findByUsername(phoneNumber)
+    public UserEntity login(String phoneNumber, String password) {
+        UserEntity user = userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         if (user.getPassword() == null) {
