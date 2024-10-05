@@ -4,9 +4,9 @@ import com.github.javabaz.darvazeh.common.base.BaseEntityRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends BaseEntityRepository<MyUser, Long> {
+public interface UserRepository extends BaseEntityRepository<UserEntity, Long> {
 
-    Optional<MyUser> findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
     boolean existsByUsername(String phoneNumber);
 
 }

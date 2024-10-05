@@ -10,8 +10,8 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class MyUser extends BaseEntity<Long> {
-
+public class UserEntity extends BaseEntity<Long> {
+    @Column(name = "username",unique = true)
     private String username;
     private String password;
     @Enumerated(EnumType.STRING)
