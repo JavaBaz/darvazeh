@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Builder
+
 public class TicketResponse {
     private Long Id;
     private Long eventId;
