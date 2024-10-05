@@ -23,8 +23,8 @@ public class AddTicketByOrganization {
 
     public TicketResponse addTicket(TicketRequest ticketRequest) {
 
-        Ticket ticket = Ticket.createTicket(null,
-                new Price(ticketRequest.getPrice()), ticketRequest.getStartTime());
+        Long price = ticketRequest.getPrice();
+        Ticket ticket = Ticket.createTicket(null, new Price(price), ticketRequest.getStartTime());
         Event event = eventService.getById(ticketRequest.getEventId());
         Long userId = JwtUser.getAuthenticatedUser().getId();
         return tickets.addTicket(ticket, userId, event.getId())
