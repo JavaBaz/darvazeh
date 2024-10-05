@@ -22,7 +22,7 @@ public class EventController {
         return new ResponseEntity<>(eventFound, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/by-category/{id}")
     public ResponseEntity<Page<Event>> getAllByCategories(@RequestParam(defaultValue = "0") int page,
                                                           @RequestParam(defaultValue = "10") int size,
                                                           @PathVariable Long id) {
@@ -31,27 +31,27 @@ public class EventController {
     }
 
 
-    @GetMapping
+    @GetMapping("/by-type")
     public List<Event> getByType(@RequestParam EventType eventType) {
         return eventService.getByEventType(eventType);
     }
 
-    @GetMapping
+    @GetMapping("/by-date")
     List<Event> getByDate(@RequestParam LocalDate localDate) {
         return eventService.getByEventDate(localDate);
     }
 
-    @GetMapping
+    @GetMapping("/by-date-range")
     List<Event> getByDate(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         return eventService.getByEventDateBetween(startDate, endDate);
     }
 
-    @GetMapping
+    @GetMapping("/by-capacity-greater-than")
     List<Event> getCapacityGreaterThanEqual(@RequestParam long capacity) {
         return eventService.getByTotalCapacityGreaterThanEqual(capacity);
     }
 
-    @GetMapping
+    @GetMapping("/by-capacity-less-than")
     List<Event> getByCapacityLessThan(@RequestParam long capacity) {
         return eventService.getByTotalCapacityLessThan(capacity);
     }
