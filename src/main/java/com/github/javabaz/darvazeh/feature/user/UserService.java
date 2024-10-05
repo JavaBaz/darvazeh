@@ -102,23 +102,20 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
     }
 
     public void resetPassword(String phoneNumber, String otp, String newPassword) {
-        Optional<UnverifiedUser> unverifiedUserOpt = unverifiedUserRepository.findByUsername(phoneNumber);
-        if (unverifiedUserOpt.isEmpty()) {
-            throw new IllegalStateException("No OTP request found for this phone number.");
-        }
+        var unverifiedUser = unverifiedUserRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
-        UnverifiedUser unverifiedUser = unverifiedUserOpt.get();
 
         if (!unverifiedUser.getOtpCode().equals(otp)) {
             throw new IllegalStateException("Invalid OTP.");
         }
 
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-        if (userOpt.isPresent()) {
-            MyUser user = userOpt.get();
+
+        userRepository.findByUsername(phoneNumber).ifPresent(user -> {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
-        }
+        });
+
 
         unverifiedUserRepository.deleteByUsername(phoneNumber);
     }
