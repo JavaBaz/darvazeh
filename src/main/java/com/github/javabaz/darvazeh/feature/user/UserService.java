@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -19,10 +20,10 @@ import java.util.Optional;
 @Service
 public class UserService extends BaseServiceImpl implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
-    private OtpUtil otpUtil;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
+    private final OtpUtil otpUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
         super(userRepository);
@@ -34,28 +35,22 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MyUser> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            var userObj = user.get();
-            return User.builder()
-                    .username(userObj.getUsername())
-                    .password(userObj.getPassword())
-                    .roles(userObj.getUserRole().name())
-                    .build();
-        } else {
-            throw new UsernameNotFoundException(username);
-        }
+        return userRepository.findByUsername(username)
+                .map(userObj -> User.builder()
+                        .username(userObj.getUsername())
+                        .password(userObj.getPassword())
+                        .roles(userObj.getUserRole().name())
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
 
     public void registerUser(String phoneNumber) {
-        if (userRepository.existsByUsername(phoneNumber)) {
-            throw new IllegalStateException("Phone number is already registered.");
-        }
+        Assert.isTrue(userRepository.existsByUsername(phoneNumber), "Phone number is already registered.");
 
-        if (unverifiedUserRepository.existsByUsername(phoneNumber)) {
-            throw new IllegalStateException("Phone number is already pending verification.");
-        }
+        Assert.isTrue(unverifiedUserRepository.existsByUsername(phoneNumber),
+                "Phone number is already pending verification.");
+
 
         String otp = otpUtil.generateOtp();
         UnverifiedUser unverifiedUser = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
@@ -141,15 +136,22 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
     }
 
     public void setPassword(String phoneNumber, String password) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
-
-        MyUser user = userOpt.get();
-
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
+        userRepository.findByUsername(phoneNumber).ifPresentOrElse(user -> {
+                    user.setPassword(passwordEncoder.encode(password));
+                    userRepository.save(user);
+                },
+                () -> {
+                    throw new IllegalStateException("User not found.");
+                });
+//        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
+//
+//        if (userOpt.isEmpty()) {
+//            throw new IllegalStateException("User not found.");
+//        }
+//
+//        MyUser user = userOpt.get();
+//
+//        user.setPassword(passwordEncoder.encode(password));
+//        userRepository.save(user);
     }
 }
