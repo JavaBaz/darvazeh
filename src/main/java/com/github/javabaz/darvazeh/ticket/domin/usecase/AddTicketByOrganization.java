@@ -6,6 +6,7 @@ import com.github.javabaz.darvazeh.feature.event.EventService;
 import com.github.javabaz.darvazeh.ticket.domin.Price;
 import com.github.javabaz.darvazeh.ticket.domin.Ticket;
 import com.github.javabaz.darvazeh.ticket.domin.Tickets;
+import com.github.javabaz.darvazeh.ticket.infra.TicketEntity;
 import com.github.javabaz.darvazeh.ticket.infra.TicketRequest;
 import com.github.javabaz.darvazeh.ticket.infra.TicketResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,16 @@ public class AddTicketByOrganization {
                 new Price(ticketRequest.getPrice()), ticketRequest.getStartTime());
         Event event = eventService.getById(ticketRequest.getEventId());
         Long userId = JwtUser.getAuthenticatedUser().getId();
-        return tickets.addTicket(ticket, userId, event.getId()).map(ticketEntity ->
-                TicketResponse.builder().Id(ticketEntity.getId())
-                        .date(ticketEntity.getDateTime())
-                        .price(ticketEntity.getPrice())
-                        .eventId(event.getId())
-                        .userId(ticketEntity.getUserId()).build()
-        ).orElseThrow(() -> new IllegalStateException("Could not add ticket"));
+        return tickets.addTicket(ticket, userId, event.getId())
+                .map(ticketEntity -> getTicketResponse(ticketEntity, event))
+                .orElseThrow(() -> new IllegalStateException("Could not add ticket"));
+    }
+
+    private static TicketResponse getTicketResponse(TicketEntity ticketEntity, Event event) {
+        return TicketResponse.builder().Id(ticketEntity.getId())
+                .date(ticketEntity.getDateTime())
+                .price(ticketEntity.getPrice())
+                .eventId(event.getId())
+                .userId(ticketEntity.getUserId()).build();
     }
 }
