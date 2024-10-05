@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserEntity extends BaseEntity<Long> {
-
+    @Column(name = "username",unique = true)
     private String username;
     private String password;
     @Enumerated(EnumType.STRING)
