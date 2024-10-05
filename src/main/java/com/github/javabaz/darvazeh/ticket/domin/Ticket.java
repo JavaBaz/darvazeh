@@ -1,9 +1,11 @@
 package com.github.javabaz.darvazeh.ticket.domin;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-
+@Getter
 public class Ticket {
     private final Long ticketId;
     private final Price price;
@@ -20,7 +22,7 @@ public class Ticket {
         this.eventId = eventId;
     }
 
-    public static Ticket buyTickets(Long ticketId, Price price, Long eventId, LocalDateTime enableDateTime, Long userId) {
+    public static Ticket createTicket(Long ticketId, Price price, Long eventId, LocalDateTime enableDateTime, Long userId) {
         return new Ticket(ticketId, price, eventId, enableDateTime, userId);
     }
 
