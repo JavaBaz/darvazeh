@@ -12,17 +12,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class UserService extends BaseServiceImpl implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository> implements UserDetailsService {
 
-    private UserRepository userRepository;
-    private UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
-    private OtpUtil otpUtil;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
+    private final OtpUtil otpUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
         super(userRepository);
@@ -34,28 +35,22 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MyUser> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            var userObj = user.get();
-            return User.builder()
-                    .username(userObj.getUsername())
-                    .password(userObj.getPassword())
-                    .roles(userObj.getUserRole().name())
-                    .build();
-        } else {
-            throw new UsernameNotFoundException(username);
-        }
+        return userRepository.findByUsername(username)
+                .map(userObj -> User.builder()
+                        .username(userObj.getUsername())
+                        .password(userObj.getPassword())
+                        .roles(userObj.getUserRole().name())
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
 
     public void registerUser(String phoneNumber) {
-        if (userRepository.existsByUsername(phoneNumber)) {
-            throw new IllegalStateException("Phone number is already registered.");
-        }
+        Assert.isTrue(userRepository.existsByUsername(phoneNumber), "Phone number is already registered.");
 
-        if (unverifiedUserRepository.existsByUsername(phoneNumber)) {
-            throw new IllegalStateException("Phone number is already pending verification.");
-        }
+        Assert.isTrue(unverifiedUserRepository.existsByUsername(phoneNumber),
+                "Phone number is already pending verification.");
+
 
         String otp = otpUtil.generateOtp();
         UnverifiedUser unverifiedUser = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
@@ -66,18 +61,13 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
 
 
     public void verifyOtp(String phoneNumber, String otp, UserRole role) {
-        Optional<UnverifiedUser> unverifiedUserOpt = unverifiedUserRepository.findByUsername(phoneNumber);
-        if (unverifiedUserOpt.isEmpty()) {
-            throw new IllegalStateException("Phone number is not pending verification.");
-        }
+        UnverifiedUser unverifiedUser = unverifiedUserRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("Phone number is not pending verification."));
 
-        UnverifiedUser unverifiedUser = unverifiedUserOpt.get();
+        Optional.of(unverifiedUser).filter(user -> user.getOtpCode().equals(otp))
+                .orElseThrow(() -> new IllegalStateException("Invalid OTP."));
 
-        if (!unverifiedUser.getOtpCode().equals(otp)) {
-            throw new IllegalStateException("Invalid OTP.");
-        }
-
-        MyUser newUser = new MyUser();
+        var newUser = new UserEntity();
         newUser.setUsername(phoneNumber);
         newUser.setUserRole(role);
         userRepository.save(newUser);
@@ -85,14 +75,9 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
         unverifiedUserRepository.deleteByUsername(phoneNumber);
     }
 
-    public MyUser login(String phoneNumber, String password) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
-
-        MyUser user = userOpt.get();
+    public UserEntity login(String phoneNumber, String password) {
+        UserEntity user = userRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         if (user.getPassword() == null) {
             throw new IllegalStateException("User has not set a password yet. Please set your password.");
@@ -106,50 +91,43 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
     }
 
     public void sendPasswordResetOtp(String phoneNumber) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
+        userRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("User not found."));
 
         String otp = otpUtil.generateOtp();
         otpUtil.sendOtpSms(phoneNumber, otp);
 
-        UnverifiedUser resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
     }
 
     public void resetPassword(String phoneNumber, String otp, String newPassword) {
-        Optional<UnverifiedUser> unverifiedUserOpt = unverifiedUserRepository.findByUsername(phoneNumber);
-        if (unverifiedUserOpt.isEmpty()) {
-            throw new IllegalStateException("No OTP request found for this phone number.");
-        }
+        var unverifiedUser = unverifiedUserRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
-        UnverifiedUser unverifiedUser = unverifiedUserOpt.get();
 
         if (!unverifiedUser.getOtpCode().equals(otp)) {
             throw new IllegalStateException("Invalid OTP.");
         }
 
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-        if (userOpt.isPresent()) {
-            MyUser user = userOpt.get();
+
+        userRepository.findByUsername(phoneNumber).ifPresent(user -> {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
-        }
+        });
+
 
         unverifiedUserRepository.deleteByUsername(phoneNumber);
     }
 
     public void setPassword(String phoneNumber, String password) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
+        userRepository.findByUsername(phoneNumber).ifPresentOrElse(user -> {
+                    user.setPassword(passwordEncoder.encode(password));
+                    userRepository.save(user);
+                },
+                () -> {
+                    throw new IllegalStateException("User not found.");
+                });
 
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
-
-        MyUser user = userOpt.get();
-
-        user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
     }
 }
