@@ -76,13 +76,8 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
     }
 
     public MyUser login(String phoneNumber, String password) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
-
-        MyUser user = userOpt.get();
+        MyUser user = userRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
         if (user.getPassword() == null) {
             throw new IllegalStateException("User has not set a password yet. Please set your password.");
@@ -96,15 +91,13 @@ public class UserService extends BaseServiceImpl implements UserDetailsService {
     }
 
     public void sendPasswordResetOtp(String phoneNumber) {
-        Optional<MyUser> userOpt = userRepository.findByUsername(phoneNumber);
-        if (userOpt.isEmpty()) {
-            throw new IllegalStateException("User not found.");
-        }
+        userRepository.findByUsername(phoneNumber)
+                .orElseThrow(() -> new IllegalStateException("User not found."));
 
         String otp = otpUtil.generateOtp();
         otpUtil.sendOtpSms(phoneNumber, otp);
 
-        UnverifiedUser resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
     }
 
