@@ -10,8 +10,6 @@ import com.github.javabaz.darvazeh.ticket.infra.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 public class AddTicketByOrganization {
@@ -24,7 +22,9 @@ public class AddTicketByOrganization {
         Ticket ticket = Ticket.createTicket(null,
                 new Price(ticketRequest.getPrice()), ticketRequest.getStartTime());
         Event event = eventService.getById(ticketRequest.getEventId());
-        return tickets.addTicket(ticket, userid, event.getId()).map(ticketEntity -> new TicketResponse(ticketEntity.getId(), ticketEntity.getEventId(), ticketEntity.getPrice()
-                , ticketEntity.getUserId(), ticketEntity.getDateTime()));
+        return tickets.addTicket(ticket, getCurrenUser(), event.getId()).map(ticketEntity ->
+                new TicketResponse(ticketEntity.getId(),
+                        ticketEntity.getEventId(), ticketEntity.getPrice()
+                        , ticketEntity.getUserId(), ticketEntity.getDateTime()));
     }
 }

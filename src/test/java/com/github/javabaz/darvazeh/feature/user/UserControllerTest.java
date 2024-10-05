@@ -1,6 +1,5 @@
 package com.github.javabaz.darvazeh.feature.user;
 
-import com.github.javabaz.darvazeh.common.auth.jwt.JwtService;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
