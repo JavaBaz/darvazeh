@@ -13,8 +13,8 @@ class BuyTicketShould {
     @Test
     public void add_when_have_specified_type_and_price() {
         var price = new Price(12L);
-        var ticket = Ticket.createTicket(1L, price, 1L, LocalDateTime.now(), 1L);
-        Assertions.assertThat(ticket.getEventId()).isEqualTo(1L);
+        var ticket = Ticket.createTicket(1L, price, LocalDateTime.now());
+        Assertions.assertThat(ticket.getPrice().price()).isEqualTo(12L);
 
     }
 

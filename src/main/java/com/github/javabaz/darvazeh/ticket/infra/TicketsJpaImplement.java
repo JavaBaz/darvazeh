@@ -14,17 +14,16 @@ public class TicketsJpaImplement implements Tickets {
     private final TicketJpaRepository ticketJpaRepository;
 
     @Override
-    public Ticket addTicket(Ticket ticket) {
-        TicketEntity ticketEntity = TicketEntity.builder().eventId(ticket.getEventId())
+    public Ticket addTicket(Ticket ticket, Long userId, Long eventId) {
+        TicketEntity ticketEntity = TicketEntity.builder().eventId(eventId)
                 .price(ticket.getPrice().price())
                 .dateTime(ticket.getEnableDateTime())
-                .userId(ticket.getUserId())
+                .userId(userId)
                 .build();
 
         return Optional.of(ticketJpaRepository.save(ticketEntity))
-                .map(entity -> Ticket.createTicket(entity.getId(), new Price(entity.getPrice())
-                        , entity.getEventId(), entity.getDateTime(), entity.getUserId()))
-                .orElseThrow(() -> new IllegalArgumentException("can not create ticket"));
+                .map(entity -> Ticket.createTicket(entity.getId(), new Price(entity.getPrice()), entity.getDateTime()))
+                        .orElseThrow(() -> new IllegalArgumentException("can not create ticket"));
     }
 
     @Override
