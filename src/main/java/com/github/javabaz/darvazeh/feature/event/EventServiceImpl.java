@@ -2,13 +2,13 @@ package com.github.javabaz.darvazeh.feature.event;
 
 import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.event.enums.EventType;
-import com.github.javabaz.darvazeh.feature.event.eventcategory.EventCategory;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EventServiceImpl extends BaseServiceImpl<Event, Long, EventRepository> implements EventService {
@@ -35,12 +35,14 @@ public class EventServiceImpl extends BaseServiceImpl<Event, Long, EventReposito
 
     @Override
     public List<Event> getByEventDateBetween(LocalDate startDate, LocalDate endDate) {
+        Assert.isTrue(startDate.isBefore(endDate), "Start date must be before end date");
         return repository.findByEventDateBetween(startDate, endDate);
     }
 
+
     @Override
-    public List<Event> getByEventCategory(EventCategory eventCategory) {
-        return repository.findByEventCategory(eventCategory);
+    public Page<Event> getByEventCategory(Long eventCategoryId, int size, int page) {
+        return repository.findByEventCategory(eventCategoryId, PageRequest.of(page, size));
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.github.javabaz.darvazeh.feature.event;
 
 import com.github.javabaz.darvazeh.feature.event.enums.EventType;
 import com.github.javabaz.darvazeh.feature.event.eventcategory.EventCategory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +17,8 @@ public interface EventService {
 
     List<Event> getByEventDateBetween(LocalDate startDate, LocalDate endDate);
 
-    List<Event> getByEventCategory(EventCategory eventCategory);
+
+    Page<Event> getByEventCategory(Long eventCategoryId, int size, int page);
 
     List<Event> getByTotalCapacityGreaterThanEqual(long capacity);
 
