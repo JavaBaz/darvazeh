@@ -4,6 +4,7 @@ import com.github.javabaz.darvazeh.feature.event.Event;
 import com.github.javabaz.darvazeh.feature.event.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,10 +13,12 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TicketService {
     private final EventService eventService;
     private final TicketRepository ticketRepository;
 
+    @Transactional(rollbackFor = Exception.class)
     public TicketResponse add(TicketRequest ticketRequest) {
         Event event = eventService.getById(ticketRequest.getEventId());
         hasValidCapacity(event);
@@ -29,18 +32,21 @@ public class TicketService {
         event.setTicketEntities(List.of(ticketEntity));
         TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
 
-        TicketResponse.EventResponse eventResponse = TicketResponse.EventResponse.builder()
+
+        return TicketResponse.builder()
+                .ticketId(ticketSaved.getId())
+                .eventResponse(getEventResponse(ticketSaved))
+                .price(ticketSaved.getPrice()).build();
+
+    }
+
+    private TicketResponse.EventResponse getEventResponse(TicketEntity ticketSaved) {
+        return TicketResponse.EventResponse.builder()
                 .eventCategory(ticketSaved.getEvent().getEventCategory())
                 .eventType(ticketSaved.getEvent().getEventType())
                 .eventDate(ticketSaved.getEvent().getEventDate())
                 .location(ticketSaved.getEvent().getLocation())
                 .totalCapacity(ticketSaved.getTotalCapacity()).build();
-
-        return TicketResponse.builder()
-                .ticketId(ticketSaved.getId())
-                .eventResponse(eventResponse)
-                .price(ticketSaved.getPrice()).build();
-
     }
 
     private void hasValidCapacity(Event event) {
