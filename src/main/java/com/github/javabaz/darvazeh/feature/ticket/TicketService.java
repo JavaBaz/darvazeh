@@ -31,7 +31,7 @@ public class TicketService {
                 .enableDateTo(ticketRequest.getEnabledTo())
                 .event(event)
                 .build();
-        //todo ticket is saved or not saved yet cascade all
+        //todo ticket is saved or not saved yet cascade all amin
         event.setTicketEntities(List.of(ticketEntity));
         TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
 
