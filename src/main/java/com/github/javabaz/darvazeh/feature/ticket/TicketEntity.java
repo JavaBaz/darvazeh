@@ -21,5 +21,5 @@ public class TicketEntity extends BaseEntity<Long> {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
     private Event event;
-    private int totalCapacity;
+    private int countOfTicket;
 }

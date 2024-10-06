@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,12 +23,14 @@ public class TicketService {
     public TicketResponse add(TicketRequest ticketRequest) {
         Event event = eventService.getById(ticketRequest.getEventId());
         hasValidCapacity(event);
+        dateValidation(event.getEventDate(), ticketRequest.getEnabledFrom(), ticketRequest.getEnabledTo());
         TicketEntity ticketEntity = TicketEntity.builder()
-                .totalCapacity(getTotalCapacity(event))
+                .countOfTicket(getTotalCapacity(event))
                 .price(ticketRequest.getPrice())
-                .enableDateFrom(isValidDate(ticketRequest.getEnabledFrom()))
-                .enableDateTo(isValidDate(ticketRequest.getEnabledTo()))
-                .event(event).build();
+                .enableDateFrom(ticketRequest.getEnabledFrom())
+                .enableDateTo(ticketRequest.getEnabledTo())
+                .event(event)
+                .build();
         //todo ticket is saved or not saved yet cascade all
         event.setTicketEntities(List.of(ticketEntity));
         TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
@@ -46,7 +49,7 @@ public class TicketService {
                 .eventType(ticketSaved.getEvent().getEventType())
                 .eventDate(ticketSaved.getEvent().getEventDate())
                 .location(ticketSaved.getEvent().getLocation())
-                .totalCapacity(ticketSaved.getTotalCapacity()).build();
+                .totalCapacity(ticketSaved.getCountOfTicket()).build();
     }
 
     private void hasValidCapacity(Event event) {
@@ -54,10 +57,15 @@ public class TicketService {
             throw new IllegalStateException("you can not add new ticket");
     }
 
-    private LocalDateTime isValidDate(LocalDateTime enableDateFrom) {
-        if (enableDateFrom != null && enableDateFrom.isBefore(LocalDateTime.now()))
-            throw new IllegalArgumentException("your data is not valid");
-        return enableDateFrom;
+    private void dateValidation(LocalDate dateOfEvent, LocalDateTime startSell, LocalDateTime endSell) {
+        LocalDateTime eventTime = dateOfEvent.atStartOfDay();
+        if (endSell == null)
+            endSell = eventTime;
+        if (startSell.isAfter(eventTime) || endSell.isAfter(eventTime))
+            throw new IllegalStateException("");
+
+        if (startSell.isBefore(endSell))
+            throw new IllegalStateException("");
     }
 
     private int getTotalCapacity(Event event) {
