@@ -62,21 +62,25 @@ public class TicketService {
     }
 
     private void dateValidation(LocalDate dateOfEvent, LocalDateTime startSell, LocalDateTime endSell) {
-        LocalDateTime eventTime = dateOfEvent.atStartOfDay();
-        if (endSell == null)
-            endSell = eventTime;
-        if (startSell.isAfter(eventTime) || endSell.isAfter(eventTime))
-            throw new IllegalStateException("");
+        LocalDateTime eventStartTime = dateOfEvent.atStartOfDay();
 
-        if (startSell.isBefore(endSell))
-            throw new IllegalStateException("");
-    }
+        if (endSell == null) {
+            endSell = eventStartTime;
+        }
+        if (startSell == null) {
+            startSell = LocalDateTime.now();
+        }
 
-    private int getTotalCapacity(Event event) {
-        try {
-            return (int) event.getTotalCapacity();
-        } catch (Exception exception) {
-            throw new IllegalArgumentException("number is very big ");
+        if (startSell.isAfter(eventStartTime)) {
+            throw new IllegalStateException("Start sell time cannot be after the event start time.");
+        }
+
+        if (endSell.isAfter(eventStartTime)) {
+            throw new IllegalStateException("End sell time cannot be after the event start time.");
+        }
+
+        if (startSell.isAfter(endSell)) {
+            throw new IllegalStateException("Start sell time must be before end sell time.");
         }
 
     }
