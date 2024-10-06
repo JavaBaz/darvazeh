@@ -14,7 +14,7 @@ public class TicketController {
     private final TicketService ticketService;
 
     @PostMapping("/add")
-    public TicketResponse getTicketResponse(@RequestBody @Valid TicketRequest ticketRequest) {
-        return ticketService.add(ticketRequest);
+    public CreateTicketTypeResponse getTicketResponse(@RequestBody @Valid CreateTicketTypeRequest createTicketTypeRequest) {
+        return ticketService.addNewTicket(createTicketTypeRequest);
     }
 }
