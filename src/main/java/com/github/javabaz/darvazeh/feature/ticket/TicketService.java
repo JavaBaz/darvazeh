@@ -29,7 +29,6 @@ public class TicketService {
         event.getTicketEntities().add(ticketEntity);
         TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
 
-
         return TicketResponse.builder()
                 .ticketId(ticketSaved.getId())
                 .eventResponse(getEventResponse(ticketSaved))
