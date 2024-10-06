@@ -30,5 +30,5 @@ public class Event extends BaseEntity<Long> {
     private LocalDate eventDate;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TicketEntity> ticketEntities;
+    private List<TicketType> ticketTypeEntities;
 }

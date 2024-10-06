@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
-public class TicketEntity extends BaseEntity<Long> {
+public class TicketType extends BaseEntity<Long> {
     private long price;
     @Column(nullable = false)
     private LocalDateTime enableDateFrom;
