@@ -8,9 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -20,40 +17,42 @@ public class TicketService {
     private final TicketRepository ticketRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public TicketResponse add(TicketRequest ticketRequest) {
-        Event event = eventService.getById(ticketRequest.getEventId());
-        hasValidCapacity(event);
-        dateValidation(event.getEventDate(), ticketRequest.getEnabledFrom(), ticketRequest.getEnabledTo());
-        TicketEntity ticketEntity = getTicketEntity(ticketRequest, event);
-        //todo ticket is saved or not saved yet cascade all amin
-        event.getTicketEntities().add(ticketEntity);
-        TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
+    public CreateTicketTypeResponse addNewTicket(CreateTicketTypeRequest createTicketTypeRequest) {
+        Event event = eventService.getById(createTicketTypeRequest.getEventId());
+
+        hasValidCapacity(event, createTicketTypeRequest);
+        dateValidation(event.getEventDate(), createTicketTypeRequest.getEnabledFrom(), createTicketTypeRequest.getEnabledTo());
+
+        TicketType ticketType = getTicketEntity(createTicketTypeRequest, event);
+        event.getTicketTypeEntities().add(ticketType);
+
+        TicketType ticketTypeSaved = ticketRepository.save(ticketType);
 
 
-        return TicketResponse.builder()
-                .ticketId(ticketSaved.getId())
-                .eventResponse(getEventResponse(ticketSaved))
-                .price(ticketSaved.getPrice()).build();
+        return CreateTicketTypeResponse.builder()
+                .ticketId(ticketTypeSaved.getId())
+                .eventResponse(getEventResponse(ticketTypeSaved))
+                .price(ticketTypeSaved.getPrice()).build();
 
     }
 
-    private TicketEntity getTicketEntity(TicketRequest ticketRequest, Event event) {
-        return TicketEntity.builder()
-                .countOfTicket(getTotalCapacity(event))
-                .price(ticketRequest.getPrice())
-                .enableDateFrom(ticketRequest.getEnabledFrom())
-                .enableDateTo(ticketRequest.getEnabledTo())
+    private TicketType getTicketEntity(CreateTicketTypeRequest createTicketTypeRequest, Event event) {
+        return TicketType.builder()
+                .quantity(createTicketTypeRequest.getQuantity())
+                .price(createTicketTypeRequest.getPrice())
+                .enableDateFrom(createTicketTypeRequest.getEnabledFrom())
+                .enableDateTo(createTicketTypeRequest.getEnabledTo())
                 .event(event)
                 .build();
     }
 
-    private TicketResponse.EventResponse getEventResponse(TicketEntity ticketSaved) {
-        return TicketResponse.EventResponse.builder()
-                .eventCategory(ticketSaved.getEvent().getEventCategory())
-                .eventType(ticketSaved.getEvent().getEventType())
-                .eventDate(ticketSaved.getEvent().getEventDate())
-                .location(ticketSaved.getEvent().getLocation())
-                .totalCapacity(ticketSaved.getCountOfTicket()).build();
+    private CreateTicketTypeResponse.EventResponse getEventResponse(TicketType ticketTypeSaved) {
+        return CreateTicketTypeResponse.EventResponse.builder()
+                .eventCategory(ticketTypeSaved.getEvent().getEventCategory())
+                .eventType(ticketTypeSaved.getEvent().getEventType())
+                .eventDate(ticketTypeSaved.getEvent().getEventDate())
+                .location(ticketTypeSaved.getEvent().getLocation())
+                .totalCapacity(ticketTypeSaved.getQuantity()).build();
     }
 
     private void hasValidCapacity(Event event, CreateTicketTypeRequest createTicketTypeRequest) {
