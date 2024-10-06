@@ -3,7 +3,7 @@ package com.github.javabaz.darvazeh.feature.event;
 import com.github.javabaz.darvazeh.common.base.BaseEntity;
 import com.github.javabaz.darvazeh.feature.event.enums.EventType;
 import com.github.javabaz.darvazeh.feature.event.eventcategory.EventCategory;
-import com.github.javabaz.darvazeh.feature.ticket.TicketEntity;
+import com.github.javabaz.darvazeh.feature.ticket.TicketType;
 import jakarta.persistence.*;
 
 import lombok.Getter;
