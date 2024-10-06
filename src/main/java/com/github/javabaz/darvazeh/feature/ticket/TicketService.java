@@ -56,9 +56,18 @@ public class TicketService {
                 .totalCapacity(ticketSaved.getCountOfTicket()).build();
     }
 
-    private void hasValidCapacity(Event event) {
-        if (event.getTicketEntities().size() <= event.getTotalCapacity())
-            throw new IllegalStateException("you can not add new ticket");
+    private void hasValidCapacity(Event event, CreateTicketTypeRequest createTicketTypeRequest) {
+        long filledCapacity = event.getTicketTypeEntities().stream()
+                .mapToLong(TicketType::getQuantity)
+                .sum();
+
+        long remainingCapacity = event.getTotalCapacity() - filledCapacity;
+
+        if (remainingCapacity < createTicketTypeRequest.getQuantity()) {
+            throw new IllegalStateException(String.format(
+                    "Cannot add %d tickets; remaining capacity for event '%s' is only %d.",
+                    createTicketTypeRequest.getQuantity(), event.getName(), remainingCapacity));
+        }
     }
 
     private void dateValidation(LocalDate dateOfEvent, LocalDateTime startSell, LocalDateTime endSell) {
