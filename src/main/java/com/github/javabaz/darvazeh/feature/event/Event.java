@@ -20,9 +20,11 @@ public class Event extends BaseEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "event_category_id")
     private EventCategory eventCategory;
-    //todo name is must be unique or not
+
+    @Column(unique = true)
     private String name;
     private String description;
+
     @Enumerated(EnumType.STRING)
     private EventType eventType;
     private String location;
