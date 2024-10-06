@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TicketResponse {
+public class CreateTicketTypeResponse {
     private long ticketId;
     private long price;
     private EventResponse eventResponse;

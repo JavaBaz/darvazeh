@@ -8,11 +8,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class TicketRequest {
+public class CreateTicketTypeRequest {
     @NotNull
     private long eventId;
     private long price;
     @NotNull
     private LocalDateTime enabledFrom;
     private LocalDateTime enabledTo;
+    private int quantity;
 }
