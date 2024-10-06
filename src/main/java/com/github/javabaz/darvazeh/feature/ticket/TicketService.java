@@ -24,15 +24,9 @@ public class TicketService {
         Event event = eventService.getById(ticketRequest.getEventId());
         hasValidCapacity(event);
         dateValidation(event.getEventDate(), ticketRequest.getEnabledFrom(), ticketRequest.getEnabledTo());
-        TicketEntity ticketEntity = TicketEntity.builder()
-                .countOfTicket(getTotalCapacity(event))
-                .price(ticketRequest.getPrice())
-                .enableDateFrom(ticketRequest.getEnabledFrom())
-                .enableDateTo(ticketRequest.getEnabledTo())
-                .event(event)
-                .build();
+        TicketEntity ticketEntity = getTicketEntity(ticketRequest, event);
         //todo ticket is saved or not saved yet cascade all amin
-        event.setTicketEntities(List.of(ticketEntity));
+        event.getTicketEntities().add(ticketEntity);
         TicketEntity ticketSaved = ticketRepository.save(ticketEntity);
 
 
@@ -41,6 +35,16 @@ public class TicketService {
                 .eventResponse(getEventResponse(ticketSaved))
                 .price(ticketSaved.getPrice()).build();
 
+    }
+
+    private TicketEntity getTicketEntity(TicketRequest ticketRequest, Event event) {
+        return TicketEntity.builder()
+                .countOfTicket(getTotalCapacity(event))
+                .price(ticketRequest.getPrice())
+                .enableDateFrom(ticketRequest.getEnabledFrom())
+                .enableDateTo(ticketRequest.getEnabledTo())
+                .event(event)
+                .build();
     }
 
     private TicketResponse.EventResponse getEventResponse(TicketEntity ticketSaved) {
