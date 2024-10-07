@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
-                                      ID extends Serializable,
-                                      R extends BaseEntityRepository<E, ID>
-                                     >
-                                     implements BaseService<E, ID> {
+        ID extends Serializable,
+        R extends BaseEntityRepository<E, ID>
+        >
+        implements BaseService<E, ID> {
 
 
     protected final R repository;
@@ -49,11 +49,12 @@ public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
 
     @Override
     public E getById(ID id) {
-        Optional<E> e;
-        e = repository.findById(id);
-        if (e.isEmpty())
-            throw new EntityNotFoundException("Entity does not exist");
-        return e.get();
+//        Optional<E> e;
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity does not exist"));
+
+//        if (e.isEmpty())
+//            throw new EntityNotFoundException("Entity does not exist");
+//        return e.get();
     }
 
     @Override
@@ -79,15 +80,15 @@ public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
         return repository.findByCreatedAtAfter(createdAt);
     }
 
-    public List<E> getAllUpdatedAfter(LocalDate updatedAt){
+    public List<E> getAllUpdatedAfter(LocalDate updatedAt) {
         return repository.findByUpdatedAtAfter(updatedAt);
     }
 
-    public List<E> getAllCreatedBefore(LocalDate createdAt){
+    public List<E> getAllCreatedBefore(LocalDate createdAt) {
         return repository.findByCreatedAtBefore(createdAt);
     }
 
-    public List<E> getAllUpdatedBefore(LocalDate updatedAt){
+    public List<E> getAllUpdatedBefore(LocalDate updatedAt) {
         return repository.findByUpdatedAtBefore(updatedAt);
     }
 }
