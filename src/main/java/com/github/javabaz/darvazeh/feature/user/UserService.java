@@ -51,12 +51,8 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
         Assert.isTrue(unverifiedUserRepository.existsByUsername(phoneNumber),
                 "Phone number is already pending verification.");
 
+        otpUtil.sendOtpSms(phoneNumber);
 
-        String otp = otpUtil.generateOtp();
-        UnverifiedUser unverifiedUser = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
-        unverifiedUserRepository.save(unverifiedUser);
-
-        otpUtil.sendOtpSms(phoneNumber, otp);
     }
 
 
@@ -94,11 +90,11 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-        String otp = otpUtil.generateOtp();
-        otpUtil.sendOtpSms(phoneNumber, otp);
+//        String otp = otpUtil.generateOtp();
+        otpUtil.sendOtpSms(phoneNumber);
 
-        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
-        unverifiedUserRepository.save(resetRequest);
+//        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+//        unverifiedUserRepository.save(resetRequest);
     }
 
     public void resetPassword(String phoneNumber, String otp, String newPassword) {

@@ -1,26 +1,43 @@
 package com.github.javabaz.darvazeh.common.auth.otp;
 
 
+import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
+import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Component
 public class OtpUtil {
 
-    private final OtpRepository otpRepository;
+    private static final int BOUND_OTP_CODE = 899_999;
+    public static final int SUM_TO_OTP = 100_000;
+    private static final int MINUTES = 3;
+    private final UnverifiedUserRepository unverifiedUserRepository;
 
-    public void sendOtpSms(String phoneNumber, String otp) {
-        System.out.println("Sending OTP Sms to: " + phoneNumber + " - OTP : " + otp);
+
+    public void sendOtpSms(String phoneNumber) {
+
+        String otpGenerated = generateOtp();
+        var unverifiedUser =
+                new UnverifiedUser(phoneNumber, otpGenerated, LocalDateTime.now().plusMinutes(MINUTES));
+        unverifiedUserRepository.save(unverifiedUser);
+        //todo api call
+
     }
 
 
     public String generateOtp() {
-        return "1234";
+        var random = new Random();
+        int code = random.nextInt(BOUND_OTP_CODE) + SUM_TO_OTP;
+        return String.valueOf(code);
     }
 
-    public boolean isValid()
-    {
-        return false;
+    public void isValid(String phoneNumber, String otp) {
+        unverifiedUserRepository.findByUsernameAndOtpCode(phoneNumber, otp)
+                .orElseThrow(IllegalStateException::new);
     }
 }
