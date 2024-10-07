@@ -1,4 +1,4 @@
-package com.github.javabaz.darvazeh.feature.ticket;
+package com.github.javabaz.darvazeh.feature.ticket.tickettype;
 
 import com.github.javabaz.darvazeh.feature.event.Event;
 import com.github.javabaz.darvazeh.feature.event.EventService;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TicketService {
+
     private final EventService eventService;
     private final TicketRepository ticketRepository;
 

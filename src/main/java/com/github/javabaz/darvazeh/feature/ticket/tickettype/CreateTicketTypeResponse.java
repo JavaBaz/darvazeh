@@ -1,4 +1,4 @@
-package com.github.javabaz.darvazeh.feature.ticket;
+package com.github.javabaz.darvazeh.feature.ticket.tickettype;
 
 import com.github.javabaz.darvazeh.feature.event.enums.EventType;
 import com.github.javabaz.darvazeh.feature.event.eventcategory.EventCategory;
@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 public class CreateTicketTypeResponse {
+
     private long ticketId;
     private long price;
     private EventResponse eventResponse;

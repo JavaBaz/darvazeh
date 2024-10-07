@@ -1,4 +1,4 @@
-package com.github.javabaz.darvazeh.feature.ticket;
+package com.github.javabaz.darvazeh.feature.ticket.tickettype;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,11 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class CreateTicketTypeRequest {
+
     @NotNull
     private long eventId;
     private long price;
+
     @NotNull
     private LocalDateTime enabledFrom;
     private LocalDateTime enabledTo;
