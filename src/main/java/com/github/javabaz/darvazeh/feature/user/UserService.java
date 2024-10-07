@@ -17,8 +17,10 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static com.github.javabaz.darvazeh.common.auth.otp.OtpUtil.MINUTES;
+
 @Service
-public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository> implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
@@ -51,8 +53,12 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
         Assert.isTrue(unverifiedUserRepository.existsByUsername(phoneNumber),
                 "Phone number is already pending verification.");
 
-        otpUtil.sendOtpSms(phoneNumber);
 
+        String otpCode = otpUtil.generateOtp();
+        var unverifiedUser = new UnverifiedUser(phoneNumber, otpCode, LocalDateTime.now().plusMinutes(MINUTES));
+        unverifiedUserRepository.save(unverifiedUser);
+
+        otpUtil.sendOtpSms(phoneNumber, otpCode);
     }
 
 
@@ -90,11 +96,11 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-//        String otp = otpUtil.generateOtp();
-        otpUtil.sendOtpSms(phoneNumber);
+        String otp = otpUtil.generateOtp();
+        otpUtil.sendOtpSms(phoneNumber, otp);
 
-//        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
-//        unverifiedUserRepository.save(resetRequest);
+        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        unverifiedUserRepository.save(resetRequest);
     }
 
     public void resetPassword(String phoneNumber, String otp, String newPassword) {

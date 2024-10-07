@@ -15,16 +15,12 @@ public class OtpUtil {
 
     private static final int BOUND_OTP_CODE = 899_999;
     public static final int SUM_TO_OTP = 100_000;
-    private static final int MINUTES = 3;
+    public static final int MINUTES = 3;
     private final UnverifiedUserRepository unverifiedUserRepository;
 
 
-    public void sendOtpSms(String phoneNumber) {
+    public void sendOtpSms(String phoneNumber, String otpCode) {
 
-        String otpGenerated = generateOtp();
-        var unverifiedUser =
-                new UnverifiedUser(phoneNumber, otpGenerated, LocalDateTime.now().plusMinutes(MINUTES));
-        unverifiedUserRepository.save(unverifiedUser);
         //todo api call
 
     }
