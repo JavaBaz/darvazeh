@@ -1,12 +1,10 @@
 package com.github.javabaz.darvazeh.common.auth.otp;
 
 
-import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.Random;
 
 @RequiredArgsConstructor
