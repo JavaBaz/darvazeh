@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class TicketService {
+public class TicketTypeService {
 
     private final EventService eventService;
-    private final TicketRepository ticketRepository;
+    private final TicketTypeRepository ticketTypeRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public CreateTicketTypeResponse addNewTicket(CreateTicketTypeRequest createTicketTypeRequest) {
@@ -27,7 +27,7 @@ public class TicketService {
         TicketType ticketType = getTicketEntity(createTicketTypeRequest, event);
         event.getTicketTypeEntities().add(ticketType);
 
-        TicketType ticketTypeSaved = ticketRepository.save(ticketType);
+        TicketType ticketTypeSaved = ticketTypeRepository.save(ticketType);
 
 
         return CreateTicketTypeResponse.builder()
