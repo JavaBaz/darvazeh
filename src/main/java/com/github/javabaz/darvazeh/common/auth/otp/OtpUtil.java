@@ -13,8 +13,6 @@ public class OtpUtil {
 
     private static final int BOUND_OTP_CODE = 899_999;
     public static final int SUM_TO_OTP = 100_000;
-    public static final int MINUTES = 3;
-    private final UnverifiedUserRepository unverifiedUserRepository;
 
 
     public void sendOtpSms(String phoneNumber, String otpCode) {
@@ -30,8 +28,5 @@ public class OtpUtil {
         return String.valueOf(code);
     }
 
-    public void isValid(String phoneNumber, String otp) {
-        unverifiedUserRepository.findByUsernameAndOtpCode(phoneNumber, otp)
-                .orElseThrow(IllegalStateException::new);
-    }
+
 }
