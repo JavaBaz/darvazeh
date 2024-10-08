@@ -11,9 +11,13 @@ import java.util.Optional;
 @Slf4j
 public record MobileNumber(String mobileNumber) {
 
+    private static final String FIRST_CHARACTER = "0";
+    private static final String REGION_CODE_IRAN = "+98";
+    private static final String REGION_CODE = "IR";
+
     public MobileNumber {
-        if (mobileNumber.startsWith("0"))
-            mobileNumber = mobileNumber.replaceFirst("0", "+98");
+        if (mobileNumber.startsWith(FIRST_CHARACTER))
+            mobileNumber = mobileNumber.replaceFirst(FIRST_CHARACTER, REGION_CODE_IRAN);
 
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
@@ -26,7 +30,7 @@ public record MobileNumber(String mobileNumber) {
             log.error("phone number is not valid {}", exception.getMessage());
         }
         number.ifPresent(phoneNumber -> {
-            boolean isValid = phoneNumberUtil.isValidNumberForRegion(phoneNumber, "IR");
+            boolean isValid = phoneNumberUtil.isValidNumberForRegion(phoneNumber, REGION_CODE);
             Assert.isTrue(isValid, "phone number is not valid");
         });
     }
