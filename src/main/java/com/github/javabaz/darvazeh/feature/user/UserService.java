@@ -1,11 +1,13 @@
 package com.github.javabaz.darvazeh.feature.user;
 
+import com.github.javabaz.darvazeh.common.MobileNumber;
 import com.github.javabaz.darvazeh.common.auth.otp.OtpUtil;
 import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,8 +19,9 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
-public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository> implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
@@ -46,17 +49,18 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
 
 
     public void registerUser(String phoneNumber) {
-        Assert.isTrue(userRepository.existsByUsername(phoneNumber), "Phone number is already registered.");
+        var mobile = new MobileNumber(phoneNumber);
+        Assert.isTrue(userRepository.existsByUsername(mobile.mobileNumber()), "Phone number is already registered.");
 
-        Assert.isTrue(unverifiedUserRepository.existsByUsername(phoneNumber),
+        Assert.isTrue(unverifiedUserRepository.existsByUsername(mobile.mobileNumber()),
                 "Phone number is already pending verification.");
 
 
         String otp = otpUtil.generateOtp();
-        UnverifiedUser unverifiedUser = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        UnverifiedUser unverifiedUser = new UnverifiedUser(mobile.mobileNumber(), otp, LocalDateTime.now());
         unverifiedUserRepository.save(unverifiedUser);
 
-        otpUtil.sendOtpSms(phoneNumber, otp);
+        otpUtil.sendOtpSms(mobile.mobileNumber(), otp);
     }
 
 
@@ -135,5 +139,6 @@ public class UserService extends BaseServiceImpl<UserEntity,Long,UserRepository>
         Optional<UserEntity> userOpt = userRepository.findByUsername(username);
         return userOpt.orElseThrow(() -> new IllegalStateException("User not found"));
     }
+
 
 }
