@@ -1,4 +1,4 @@
-package com.github.javabaz.darvazeh.feature.ticket;
+package com.github.javabaz.darvazeh.feature.ticket.tickettype;
 
 import com.github.javabaz.darvazeh.common.base.BaseEntity;
 import com.github.javabaz.darvazeh.feature.event.Event;
@@ -14,12 +14,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 public class TicketType extends BaseEntity<Long> {
+
     private long price;
+
     @Column(nullable = false)
     private LocalDateTime enableDateFrom;
     private LocalDateTime enableDateTo;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "event_id")
     private Event event;
+
     private int quantity;
 }
