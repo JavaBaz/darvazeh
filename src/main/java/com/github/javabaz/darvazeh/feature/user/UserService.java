@@ -3,7 +3,6 @@ package com.github.javabaz.darvazeh.feature.user;
 import com.github.javabaz.darvazeh.common.auth.otp.OtpUtil;
 import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
-
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import org.springframework.security.core.userdetails.User;
@@ -17,7 +16,6 @@ import org.springframework.util.Assert;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.github.javabaz.darvazeh.common.auth.otp.OtpUtil.MINUTES;
 
 @Service
 public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> implements UserDetailsService {
