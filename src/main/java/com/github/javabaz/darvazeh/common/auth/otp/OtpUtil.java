@@ -12,7 +12,7 @@ import java.util.Random;
 public class OtpUtil {
 
     private static final int BOUND_OTP_CODE = 899_999;
-    public static final int SUM_TO_OTP = 100_000;
+    private static final int SUM_TO_OTP = 100_000;
 
 
     public void sendOtpSms(String phoneNumber, String otpCode) {
