@@ -24,4 +24,7 @@ public class TicketPurchase extends BaseEntity<Long> {
 
     @Column(nullable = false)
     private LocalDateTime purchaseDateTime;
+
+    @Column(length = 3, nullable = false)
+    private String entranceCode;
 }
