@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/v1/tickets")
 @RequiredArgsConstructor
-public class TicketController {
+public class TicketTypeController {
 
-    private final TicketService ticketService;
+    private final TicketTypeService ticketTypeService;
 
     @PostMapping("/add")
     public CreateTicketTypeResponse getTicketResponse(@RequestBody @Valid CreateTicketTypeRequest createTicketTypeRequest) {
-        return ticketService.addNewTicket(createTicketTypeRequest);
+        return ticketTypeService.addNewTicket(createTicketTypeRequest);
     }
 }

@@ -1,8 +1,8 @@
 package com.github.javabaz.darvazeh.feature.ticket.tickettype;
 
+import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.event.Event;
 import com.github.javabaz.darvazeh.feature.event.EventService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,12 +10,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class TicketService {
+public class TicketTypeService extends BaseServiceImpl<TicketType, Long, TicketTypeRepository> {
 
     private final EventService eventService;
-    private final TicketRepository ticketRepository;
+
+    public TicketTypeService(EventService eventService, TicketTypeRepository repository) {
+        super(repository);
+        this.eventService = eventService;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public CreateTicketTypeResponse addNewTicket(CreateTicketTypeRequest createTicketTypeRequest) {
@@ -27,7 +30,7 @@ public class TicketService {
         TicketType ticketType = getTicketEntity(createTicketTypeRequest, event);
         event.getTicketTypeEntities().add(ticketType);
 
-        TicketType ticketTypeSaved = ticketRepository.save(ticketType);
+        TicketType ticketTypeSaved = repository.save(ticketType);
 
 
         return CreateTicketTypeResponse.builder()
