@@ -9,6 +9,7 @@ import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,18 +31,15 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
-    private final OtpUtil otpUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository
+            , PasswordEncoder passwordEncoder) {
         super(userRepository);
         this.userRepository = userRepository;
         this.unverifiedUserRepository = unverifiedUserRepository;
-        this.otpUtil = otpUtil;
         this.passwordEncoder = passwordEncoder;
     }
-
-
 
 
     public void registerUser(String phoneNumber) {
@@ -52,11 +50,11 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 "Phone number is already pending verification.");
 
 
-        String otp = otpUtil.generateOtp();
+        String otp = OtpUtil.generateOtp();
         UnverifiedUser unverifiedUser = new UnverifiedUser(mobile.mobileNumber(), otp, LocalDateTime.now());
         unverifiedUserRepository.save(unverifiedUser);
 
-        otpUtil.sendOtpSms(mobile.mobileNumber(), otp);
+        OtpUtil.sendOtpSms(mobile.mobileNumber(), otp);
     }
 
 
@@ -91,8 +89,8 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-        String otpCode = otpUtil.generateOtp();
-        otpUtil.sendOtpSms(phoneNumber, otpCode);
+        String otpCode = OtpUtil.generateOtp();
+        OtpUtil.sendOtpSms(phoneNumber, otpCode);
 
         var resetRequest = new UnverifiedUser(phoneNumber, otpCode, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
@@ -103,7 +101,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
 
-        isTrue(unverifiedUser.getOtpCode().equals(otp),"Invalid OTP.");
+        isTrue(unverifiedUser.getOtpCode().equals(otp), "Invalid OTP.");
 
 
         userRepository.findByUsername(phoneNumber).ifPresent(user -> {
