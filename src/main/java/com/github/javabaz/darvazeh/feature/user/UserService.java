@@ -139,7 +139,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
 
     public void isValid(String phoneNumber, String otp) {
         unverifiedUserRepository.findByUsernameAndOtpCode(phoneNumber, otp)
-                .orElseThrow(IllegalStateException::new);
+                .orElseThrow(() -> new IllegalStateException("Invalid phone number or OTP provided"));
     }
 
 }
