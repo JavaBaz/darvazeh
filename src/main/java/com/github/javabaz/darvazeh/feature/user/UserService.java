@@ -65,9 +65,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         Optional.of(unverifiedUser).filter(user -> user.getOtpCode().equals(otp))
                 .orElseThrow(() -> new IllegalStateException("Invalid OTP."));
 
-        var newUser = new UserEntity();
-        newUser.setUsername(phoneNumber);
-        newUser.setUserRole(role);
+        var newUser = new UserEntity(phoneNumber, role);
         userRepository.save(newUser);
 
         unverifiedUserRepository.deleteByUsername(phoneNumber);
