@@ -26,7 +26,7 @@ import static java.util.Objects.*;
 
 @Slf4j
 @Service
-public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> {
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
@@ -41,16 +41,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(userObj -> User.builder()
-                        .username(userObj.getUsername())
-                        .password(userObj.getPassword())
-                        .roles(userObj.getUserRole().name())
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException(username));
-    }
+
 
 
     public void registerUser(String phoneNumber) {
