@@ -1,17 +1,32 @@
 package com.github.javabaz.darvazeh.common.auth.otp;
 
 
+import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
+@RequiredArgsConstructor
 @Component
 public class OtpUtil {
 
-    public void sendOtpSms(String phoneNumber, String otp) {
-        System.out.println("Sending OTP Sms to: " + phoneNumber + " - OTP : " + otp);
+    private static final int BOUND_OTP_CODE = 899_999;
+    public static final int SUM_TO_OTP = 100_000;
+
+
+    public void sendOtpSms(String phoneNumber, String otpCode) {
+
+        //todo api call
+
     }
 
 
-    public String generateOtp(){
-        return "1234";
+    public String generateOtp() {
+        var random = new Random();
+        int code = random.nextInt(BOUND_OTP_CODE) + SUM_TO_OTP;
+        return String.valueOf(code);
     }
+
+
 }
