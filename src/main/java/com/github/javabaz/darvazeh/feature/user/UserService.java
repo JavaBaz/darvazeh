@@ -112,9 +112,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
 
-        if (!unverifiedUser.getOtpCode().equals(otp)) {
-            throw new IllegalStateException("Invalid OTP.");
-        }
+        isTrue(unverifiedUser.getOtpCode().equals(otp),"Invalid OTP.");
 
 
         userRepository.findByUsername(phoneNumber).ifPresent(user -> {
