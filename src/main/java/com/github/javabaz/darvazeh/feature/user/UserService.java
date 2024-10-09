@@ -24,7 +24,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
     private final OtpUtil otpUtil;
     private final PasswordEncoder passwordEncoder;
-    private static final int MINUTES = 3;
+    private static final int MINUTES = 1440;
 
     public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
         super(userRepository);
