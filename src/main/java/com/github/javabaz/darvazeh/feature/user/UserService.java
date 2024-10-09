@@ -1,6 +1,7 @@
 package com.github.javabaz.darvazeh.feature.user;
 
 import com.github.javabaz.darvazeh.common.MobileNumber;
+import com.github.javabaz.darvazeh.common.Validation;
 import com.github.javabaz.darvazeh.common.auth.otp.OtpUtil;
 import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
@@ -17,7 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.github.javabaz.darvazeh.common.Validation.*;
+import static java.util.Objects.*;
 
 @Slf4j
 @Service
@@ -83,13 +88,10 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         UserEntity user = userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
 
-        if (user.getPassword() == null) {
-            throw new IllegalStateException("User has not set a password yet. Please set your password.");
-        }
+        isTrue(nonNull(user.getPassword()), "User has not set a password yet. Please set your password.");
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalStateException("Invalid password.");
-        }
+        isTrue(passwordEncoder.matches(password, user.getPassword()), "Invalid password.");
+
 
         return user;
     }
@@ -98,10 +100,10 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-        String otp = otpUtil.generateOtp();
-        otpUtil.sendOtpSms(phoneNumber, otp);
+        String otpCode = otpUtil.generateOtp();
+        otpUtil.sendOtpSms(phoneNumber, otpCode);
 
-        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        var resetRequest = new UnverifiedUser(phoneNumber, otpCode, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
     }
 
