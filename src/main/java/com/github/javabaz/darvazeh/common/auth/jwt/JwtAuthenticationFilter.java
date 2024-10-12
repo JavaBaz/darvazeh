@@ -1,5 +1,6 @@
 package com.github.javabaz.darvazeh.common.auth.jwt;
 
+import com.github.javabaz.darvazeh.common.auth.CustomUserDetails;
 import com.github.javabaz.darvazeh.feature.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,11 +19,12 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserService userService;
+    private final CustomUserDetails customUserDetails;
+//    private final UserService userService;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserService userService) {
+    public JwtAuthenticationFilter(JwtService jwtService, CustomUserDetails customUserDetails) {
         this.jwtService = jwtService;
-        this.userService = userService;
+        this.customUserDetails = customUserDetails;
     }
 
     @Override
@@ -36,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = authHeader.substring(7);
         String username = jwtService.extractUsername(jwt);
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService.loadUserByUsername(username);
+            UserDetails userDetails = customUserDetails.loadUserByUsername(username);
             if (userDetails != null && jwtService.isTokenValid(jwt)) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         username,
