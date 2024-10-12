@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface TicketPurchaseService extends BaseService<TicketPurchase, Long> {
 
-    List<TicketPurchase> getByUser(UserEntity user);
-    List<TicketPurchase> getByTicketType(TicketType ticketType);
+    List<TicketPurchase> getAllByUser(UserEntity user);
+    List<TicketPurchase> getAllByTicketType(TicketType ticketType);
+    TicketPurchase purchaseTicket(UserEntity user, TicketType ticketType);
 }

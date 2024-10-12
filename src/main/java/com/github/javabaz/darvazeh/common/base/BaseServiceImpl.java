@@ -6,11 +6,10 @@ import org.springframework.dao.DuplicateKeyException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
         ID extends Serializable,
-        R extends BaseEntityRepository<E, ID>
+        R extends BaseRepository<E, ID>
         >
         implements BaseService<E, ID> {
 
@@ -35,7 +34,7 @@ public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
 
     @Override
     public E update(E e) {
-        if (repository.existsById(e.getId())) {
+        if (existsById(e.getId())) {
             save(e);
             return e;
         }
@@ -44,17 +43,16 @@ public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
 
     @Override
     public void delete(E e) {
-        repository.delete(e);
+        if (existsById(e.getId())) {
+            repository.delete(e);
+        } else {
+            throw new EntityNotFoundException("Entity does not exist");
+        }
     }
 
     @Override
     public E getById(ID id) {
-//        Optional<E> e;
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity does not exist"));
-
-//        if (e.isEmpty())
-//            throw new EntityNotFoundException("Entity does not exist");
-//        return e.get();
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity with id " + id + " does not exist"));
     }
 
     @Override
@@ -72,7 +70,6 @@ public abstract class BaseServiceImpl<E extends BaseEntity<ID>,
         if (existsById(id)) {
             repository.deleteById(id);
         }
-        throw new EntityNotFoundException("Entity does not exist");
     }
 
     @Override

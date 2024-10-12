@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @NoRepositoryBean
-public interface BaseEntityRepository<E extends BaseEntity<ID>, ID extends Serializable> extends JpaRepository<E, ID> {
+public interface BaseRepository<E extends BaseEntity<ID>, ID extends Serializable> extends JpaRepository<E, ID> {
 
     List<E> findByCreatedAtAfter(LocalDate createdAt);
 
