@@ -1,7 +1,6 @@
 package com.github.javabaz.darvazeh.feature.user;
 
 import com.github.javabaz.darvazeh.common.MobileNumber;
-import com.github.javabaz.darvazeh.common.Validation;
 import com.github.javabaz.darvazeh.common.auth.otp.OtpUtil;
 import com.github.javabaz.darvazeh.common.base.BaseServiceImpl;
 import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
@@ -9,10 +8,6 @@ import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,8 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.github.javabaz.darvazeh.common.Validation.*;
-import static java.util.Objects.*;
+
 
 @Slf4j
 @Service
@@ -74,10 +68,11 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
     public UserEntity login(String phoneNumber, String password) {
         UserEntity user = userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        String userPassword = user.getPassword();
+        
+        isValid(Objects.nonNull(userPassword), "User has not set a password yet. Please set your password.");
 
-        isTrue(nonNull(user.getPassword()), "User has not set a password yet. Please set your password.");
-
-        isTrue(passwordEncoder.matches(password, user.getPassword()), "Invalid password.");
+        isValid(passwordEncoder.matches(password, userPassword), "Invalid password.");
 
 
         return user;
@@ -99,7 +94,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
 
-        isTrue(unverifiedUser.getOtpCode().equals(otp), "Invalid OTP.");
+        isValid(unverifiedUser.getOtpCode().equals(otp), "Invalid OTP.");
 
 
         userRepository.findByUsername(phoneNumber).ifPresent(user -> {
@@ -127,5 +122,10 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 .orElseThrow(() -> new IllegalStateException("User not found"));
     }
 
+    private void isValid(boolean expected, String message) {
+        if (!expected) {
+            throw new IllegalStateException(message);
+        }
+    }
 
 }
