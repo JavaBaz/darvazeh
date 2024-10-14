@@ -1,6 +1,7 @@
 package com.github.javabaz.darvazeh.common.infra;
 
 
+import com.github.javabaz.darvazeh.common.auth.CustomUserDetails;
 import com.github.javabaz.darvazeh.common.auth.jwt.JwtAuthenticationFilter;
 import com.github.javabaz.darvazeh.feature.user.UserService;
 import org.springframework.context.annotation.Bean;
@@ -22,12 +23,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final UserService userDetailService;
+    private final CustomUserDetails userDetailService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final PasswordEncoder passwordEncoder;
 
 
-    public SecurityConfiguration(UserService userDetailService, JwtAuthenticationFilter jwtAuthenticationFilter, PasswordEncoder passwordEncoder) {
+    public SecurityConfiguration(CustomUserDetails userDetailService, JwtAuthenticationFilter jwtAuthenticationFilter, PasswordEncoder passwordEncoder) {
         this.userDetailService = userDetailService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.passwordEncoder = passwordEncoder;
