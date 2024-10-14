@@ -26,13 +26,14 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
     private final PasswordEncoder passwordEncoder;
-
+    private final OtpUtil otpUtil;
     public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository
-            , PasswordEncoder passwordEncoder) {
+            , PasswordEncoder passwordEncoder, OtpUtil otpUtil) {
         super(userRepository);
         this.userRepository = userRepository;
         this.unverifiedUserRepository = unverifiedUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.otpUtil = otpUtil;
     }
 
 
@@ -44,11 +45,11 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 "Phone number is already pending verification.");
 
 
-        String otp = OtpUtil.generateOtp();
+        String otp = otpUtil.generateOtp();
         UnverifiedUser unverifiedUser = new UnverifiedUser(mobile.mobileNumber(), otp, LocalDateTime.now());
         unverifiedUserRepository.save(unverifiedUser);
 
-        OtpUtil.sendOtpSms(mobile.mobileNumber(), otp);
+        otpUtil.sendOtpSms(mobile.mobileNumber(), otp);
     }
 
 
@@ -82,8 +83,8 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-        String otpCode = OtpUtil.generateOtp();
-        OtpUtil.sendOtpSms(phoneNumber, otpCode);
+        String otpCode = otpUtil.generateOtp();
+        otpUtil.sendOtpSms(phoneNumber, otpCode);
 
         var resetRequest = new UnverifiedUser(phoneNumber, otpCode, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
