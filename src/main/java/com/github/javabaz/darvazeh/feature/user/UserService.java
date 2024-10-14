@@ -8,43 +8,31 @@ import com.github.javabaz.darvazeh.feature.user.enums.UserRole;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUser;
 import com.github.javabaz.darvazeh.feature.user.unverified.UnverifiedUserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
+
+
 
 @Slf4j
 @Service
-public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> implements UserDetailsService {
+public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepository> {
 
     private final UserRepository userRepository;
     private final UnverifiedUserRepository unverifiedUserRepository; // This part must be failed in ArchUnit test!
-    private final OtpUtil otpUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository, OtpUtil otpUtil, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UnverifiedUserRepository unverifiedUserRepository
+            , PasswordEncoder passwordEncoder) {
         super(userRepository);
         this.userRepository = userRepository;
         this.unverifiedUserRepository = unverifiedUserRepository;
-        this.otpUtil = otpUtil;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(userObj -> User.builder()
-                        .username(userObj.getUsername())
-                        .password(userObj.getPassword())
-                        .roles(userObj.getUserRole().name())
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
 
@@ -56,11 +44,11 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 "Phone number is already pending verification.");
 
 
-        String otp = otpUtil.generateOtp();
+        String otp = OtpUtil.generateOtp();
         UnverifiedUser unverifiedUser = new UnverifiedUser(mobile.mobileNumber(), otp, LocalDateTime.now());
         unverifiedUserRepository.save(unverifiedUser);
 
-        otpUtil.sendOtpSms(mobile.mobileNumber(), otp);
+        OtpUtil.sendOtpSms(mobile.mobileNumber(), otp);
     }
 
 
@@ -71,9 +59,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         Optional.of(unverifiedUser).filter(user -> user.getOtpCode().equals(otp))
                 .orElseThrow(() -> new IllegalStateException("Invalid OTP."));
 
-        var newUser = new UserEntity();
-        newUser.setUsername(phoneNumber);
-        newUser.setUserRole(role);
+        var newUser = new UserEntity(phoneNumber, role);
         userRepository.save(newUser);
 
         unverifiedUserRepository.deleteByUsername(phoneNumber);
@@ -82,14 +68,12 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
     public UserEntity login(String phoneNumber, String password) {
         UserEntity user = userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+        String userPassword = user.getPassword();
+        
+        isValid(Objects.nonNull(userPassword), "User has not set a password yet. Please set your password.");
 
-        if (user.getPassword() == null) {
-            throw new IllegalStateException("User has not set a password yet. Please set your password.");
-        }
+        isValid(passwordEncoder.matches(password, userPassword), "Invalid password.");
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalStateException("Invalid password.");
-        }
 
         return user;
     }
@@ -98,10 +82,10 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
         userRepository.findByUsername(phoneNumber)
                 .orElseThrow(() -> new IllegalStateException("User not found."));
 
-        String otp = otpUtil.generateOtp();
-        otpUtil.sendOtpSms(phoneNumber, otp);
+        String otpCode = OtpUtil.generateOtp();
+        OtpUtil.sendOtpSms(phoneNumber, otpCode);
 
-        var resetRequest = new UnverifiedUser(phoneNumber, otp, LocalDateTime.now());
+        var resetRequest = new UnverifiedUser(phoneNumber, otpCode, LocalDateTime.now());
         unverifiedUserRepository.save(resetRequest);
     }
 
@@ -110,9 +94,7 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
                 .orElseThrow(() -> new IllegalStateException("No OTP request found for this phone number."));
 
 
-        if (!unverifiedUser.getOtpCode().equals(otp)) {
-            throw new IllegalStateException("Invalid OTP.");
-        }
+        isValid(unverifiedUser.getOtpCode().equals(otp), "Invalid OTP.");
 
 
         userRepository.findByUsername(phoneNumber).ifPresent(user -> {
@@ -136,9 +118,14 @@ public class UserService extends BaseServiceImpl<UserEntity, Long, UserRepositor
     }
 
     public UserEntity getUserByUsername(String username) {
-        Optional<UserEntity> userOpt = userRepository.findByUsername(username);
-        return userOpt.orElseThrow(() -> new IllegalStateException("User not found"));
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
     }
 
+    private void isValid(boolean expected, String message) {
+        if (!expected) {
+            throw new IllegalStateException(message);
+        }
+    }
 
 }
