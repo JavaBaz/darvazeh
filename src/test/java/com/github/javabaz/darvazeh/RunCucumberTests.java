@@ -10,7 +10,7 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PUBLISH_QUIET_P
 
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("bdd")
+@SelectClasspathResource("com/github/javabaz/darvazeh")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.github.javabaz.darvazeh")
 @ConfigurationParameter(key = PLUGIN_PUBLISH_QUIET_PROPERTY_NAME, value = "true")
 //@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@RunMe and not @Skip")

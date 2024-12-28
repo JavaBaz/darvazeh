@@ -4,8 +4,8 @@ Feature: user want to buy tickets
 #    Given The application is available at "http://localhost:8080"
 #    And Health check is fine at "/actuator/health"
 
-#  @RunMe
+  @RunMe
   Scenario: open the page and click on the buy tickets button
-    Given user opene site and click on the buy tickets button"
+    Given user open site and click on the buy tickets button
     When we have  no tickets
-    Then give  exceptoin
+    Then give exception

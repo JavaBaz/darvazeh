@@ -10,8 +10,6 @@ import org.springframework.web.client.RestTemplate;
 
 public class SpringTestConfig {
 
-
-
 //        @Bean
 //        public CustomLogger customLogger() {
 //            return new CustomLogger();
